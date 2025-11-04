@@ -1,0 +1,161 @@
+{
+  "name": "daily_motivator",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "33e7d466-1124-46be-b04d-d0f63c0b0215",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://r.jina.ai/https://www.brainyquote.com/topics/daily-quotes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "94a6431f-e9fb-4d54-9137-7bf0714172ed",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant..analyse the quotations and send the best quotation that is inspirational to start the day and send it  to the slack message."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "d4c0e263-7e28-43a6-9a7b-f965913b35f2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U09NCC1R466",
+          "mode": "list",
+          "cachedResultName": "bhavanabunny1808"
+        },
+        "text": "={{ $now.month}}\n{{ $fromAI('Message_Text', ``, 'string') }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slackTool",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        208
+      ],
+      "id": "3d5a4090-21a0-4d89-887e-de5d7ddce5a6",
+      "name": "Send a message in Slack",
+      "webhookId": "185dd2e9-e826-4f8a-bdf9-16c8fa898448",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "pLysnqFWpXs4atPy",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        288,
+        208
+      ],
+      "id": "32699173-ed69-4ca6-a3e5-b805473e31cf",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4rJtSVVgQG89iEJF",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Slack": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "39e6e67a-7c08-4f34-873b-210a88c45185",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "70267e7767f77a4bddaf53990322eece6df2cf07a94acda4e017459fb32f5dc6"
+  },
+  "id": "KooM8G6EzmpNtHIH",
+  "tags": []
+}
